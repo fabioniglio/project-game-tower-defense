@@ -7,56 +7,35 @@ canvas.height = 768;
 c.fillStyle = "white";
 c.fillRect(0, 0, canvas.width, canvas.height);
 
+const placementTilesData2D = [];
+
+for (let i = 0; i < placementTilesData.length; i += 20) {
+  placementTilesData2D.push(placementTilesData.slice(i, i + 20));
+}
+
+const placementTiles = [];
+
+placementTilesData2D.forEach((row, y) => {
+  row.forEach((symbol, x) => {
+    if (symbol === 14) {
+      //adding building placement tile here
+      placementTiles.push(
+        new PlacementTile({
+          position: {
+            x: x * 64,
+            y: y * 64,
+          },
+        })
+      );
+    }
+  });
+});
+
 const image = new Image();
 image.onload = () => {
   animate();
 };
 image.src = "img/gameMap.png";
-
-class Enemy {
-  constructor({ position = { x: 0, y: 0 } }) {
-    this.position = position;
-    this.width = 100;
-    this.height = 100;
-    this.waypointIndex = 0;
-    this.center = {
-      x: this.position.x + this.width / 2,
-      y: this.position.y + this.height / 2,
-    };
-  }
-
-  draw() {
-    c.fillStyle = "red";
-    c.fillRect(this.position.x, this.position.y, this.width, this.height);
-  }
-
-  update() {
-    this.draw();
-
-    const waypoint = waypoints[this.waypointIndex];
-
-    const yDistance = waypoint.y - this.center.y;
-    const xDistance = waypoint.x - this.center.x;
-
-    const angle = Math.atan2(yDistance, xDistance);
-
-    this.position.x += Math.cos(angle);
-    this.position.y += Math.sin(angle);
-    this.center = {
-      x: this.position.x + this.width / 2,
-      y: this.position.y + this.height / 2,
-    };
-
-    // Check if within a certain "close enough" range of the waypoint
-    const distanceToWaypoint = Math.sqrt(
-      xDistance * xDistance + yDistance * yDistance
-    );
-    if (distanceToWaypoint < 5 && this.waypointIndex < waypoints.length - 1) {
-      // Use a threshold distance
-      this.waypointIndex++;
-    }
-  }
-}
 
 const enemies = [];
 for (let i = 1; i < 10; i++) {
@@ -71,12 +50,81 @@ for (let i = 1; i < 10; i++) {
   );
 }
 
+const buildings = [];
+let activeTile = undefined;
+
 function animate() {
   requestAnimationFrame(animate);
-  console.log("animate");
 
   c.drawImage(image, 0, 0);
   enemies.forEach((enemy) => {
     enemy.update();
   });
+
+  placementTiles.forEach((tile) => {
+    tile.update(mouse);
+  });
+
+  buildings.forEach((building) => {
+    building.update();
+    building.target = null;
+    const validEnemies = enemies.filter((enemy) => {
+      const xDifference = enemy.center.x - building.center.x;
+      const yDifference = enemy.center.y - building.center.y;
+
+      const distance = Math.hypot(xDifference, yDifference);
+      return distance < enemy.radius + building.radius;
+    });
+    building.target = validEnemies[0];
+    console.log(validEnemies);
+
+    for (let i = building.projectiles.length - 1; i >= 0; i--) {
+      const projectile = building.projectiles[i];
+
+      projectile.update();
+
+      const xDifference = projectile.enemy.center.x - projectile.position.x;
+      const yDifference = projectile.enemy.center.y - projectile.position.y;
+
+      const distance = Math.hypot(xDifference, yDifference);
+      if (distance < projectile.enemy.radius + projectile.radius) {
+        building.projectiles.splice(i, 1);
+      }
+    }
+  });
 }
+
+const mouse = {
+  x: undefined,
+  y: undefined,
+};
+
+canvas.addEventListener("click", (event) => {
+  if (activeTile && !activeTile.isOccupied) {
+    buildings.push(
+      new Building({
+        position: { x: activeTile.position.x, y: activeTile.position.y },
+      })
+    );
+    activeTile.isOccupied = true;
+  }
+});
+
+window.addEventListener("mousemove", (event) => {
+  mouse.x = event.clientX;
+  mouse.y = event.clientY;
+
+  activeTile = null;
+  for (let i = 0; i < placementTiles.length; i++) {
+    const tile = placementTiles[i];
+    if (
+      mouse.x > tile.position.x &&
+      mouse.x < tile.position.x + tile.size &&
+      mouse.y > tile.position.y &&
+      mouse.y < tile.position.y + tile.size
+    ) {
+      activeTile = tile;
+      break;
+    }
+  }
+});
