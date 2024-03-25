@@ -39,6 +39,10 @@ class Enemy {
     };
     this.radius = 50;
     this.health = 100;
+    this.velocity = {
+      x: 0,
+      y: 0,
+    };
   }
 
   draw() {
@@ -69,21 +73,28 @@ class Enemy {
 
     const yDistance = waypoint.y - this.center.y;
     const xDistance = waypoint.x - this.center.x;
-
     const angle = Math.atan2(yDistance, xDistance);
 
-    this.position.x += Math.cos(angle);
-    this.position.y += Math.sin(angle);
+    const speed = 6;
+    this.velocity.x = Math.cos(angle) * speed;
+    this.velocity.y = Math.sin(angle) * speed;
+
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
     this.center = {
       x: this.position.x + this.width / 2,
       y: this.position.y + this.height / 2,
     };
 
     // Check if within a certain "close enough" range of the waypoint
-    const distanceToWaypoint = Math.sqrt(
-      xDistance * xDistance + yDistance * yDistance
-    );
-    if (distanceToWaypoint < 5 && this.waypointIndex < waypoints.length - 1) {
+
+    if (
+      Math.abs(Math.round(this.center.x) - Math.round(waypoint.x)) <
+        Math.abs(this.velocity.x) &&
+      Math.abs(Math.round(this.center.y) - Math.round(waypoint.y)) <
+        Math.abs(this.velocity.y) &&
+      this.waypointIndex < waypoints.length - 1
+    ) {
       // Use a threshold distance
       this.waypointIndex++;
     }
