@@ -74,6 +74,7 @@ body {
   left: 0;
   right: 0;
   display: none;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   background: rgba(
@@ -93,11 +94,26 @@ body {
 
 #restartGameButton {
   /* transform: translate(-50%, -50%); */
+  width: 20%;
   padding: 10px 20px;
   font-size: 30px;
   font-family: "Changa One", sans-serif;
   color: white;
   background-color: #007bff;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+#backGameButton {
+  width: 20%;
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 30px;
+  font-family: "Changa One", sans-serif;
+  color: white;
+  background-color: #f62b2b;
   border: 2px solid transparent;
   border-radius: 5px;
   cursor: pointer;

@@ -1,11 +1,12 @@
 let animationId; // Declare this outside to keep track of the animation frame ID
 let gameStarted = false;
-let gameOver = false;
 
 // Get Document
 const startGameButton = document.getElementById("startGameButton");
 
 const restartGameButton = document.getElementById("restartGameButton");
+
+const backGameButton = document.getElementById("backGameButton");
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
@@ -44,9 +45,8 @@ const image = new Image();
 image.onload = () => {
   animate();
 };
-// image.src = "img/gameMap.png";
 
-const enemies = [];
+let enemies = [];
 
 function spawnEnemies(spawnCount) {
   for (let i = 1; i < spawnCount + 1; i++) {
@@ -62,7 +62,7 @@ function spawnEnemies(spawnCount) {
   }
 }
 
-const buildings = [];
+let buildings = [];
 let activeTile = undefined;
 let enemyCount = 3;
 let hearts = 10;
@@ -177,17 +177,50 @@ startGameButton.addEventListener("click", function () {
   document.getElementById("start").style.display = "none";
 });
 
-restartGameButton.addEventListener("click", function () {
-  document.getElementById("start").style.display = "flex";
-  document.getElementById("gameOver").style.display = "none";
+backGameButton.addEventListener("click", function () {
+  gameStarted = false;
+  c.fillStyle = "white";
+  c.fillRect(0, 0, canvas.width, canvas.height);
+
   coins = 100;
-  heart = 10;
+  hearts = 10;
   buildings = [];
+  enemies = [];
   activeTile = undefined;
   enemyCount = 3;
 
   document.querySelector("#coins").innerText = coins;
-  document.querySelector("#heart").innerText = coins;
+  document.querySelector("#heart").innerText = hearts;
+
+  document.getElementById("gameOver").style.display = "none";
+  document.getElementById("start").style.display = "flex";
+});
+
+restartGameButton.addEventListener("click", function () {
+  document.getElementById("gameOver").style.display = "none";
+  console.log(enemies);
+  coins = 100;
+  hearts = 10;
+  buildings = [];
+  enemies = [];
+  activeTile = undefined;
+  enemyCount = 3;
+  gameStarted = false; // Reset game started flag
+
+  spawnEnemies(enemyCount);
+
+  console.log(enemies);
+
+  document.querySelector("#coins").innerText = coins;
+  document.querySelector("#heart").innerText = hearts;
+
+  c.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Restart the game loop by calling animate() only if it's not already started
+  if (!gameStarted) {
+    gameStarted = true;
+    animate(); // This starts the game loop again
+  }
 });
 
 canvas.addEventListener("click", (event) => {
