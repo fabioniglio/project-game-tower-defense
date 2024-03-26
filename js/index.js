@@ -1,3 +1,12 @@
+let animationId; // Declare this outside to keep track of the animation frame ID
+let gameStarted = false;
+let gameOver = false;
+
+// Get Document
+const startGameButton = document.getElementById("startGameButton");
+
+const restartGameButton = document.getElementById("restartGameButton");
+
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 
@@ -35,7 +44,7 @@ const image = new Image();
 image.onload = () => {
   animate();
 };
-image.src = "img/gameMap.png";
+// image.src = "img/gameMap.png";
 
 const enemies = [];
 
@@ -62,7 +71,7 @@ let coins = 100;
 spawnEnemies(enemyCount);
 
 function animate() {
-  const animationId = requestAnimationFrame(animate);
+  animationId = requestAnimationFrame(animate);
 
   c.drawImage(image, 0, 0);
   for (let i = enemies.length - 1; i >= 0; i--) {
@@ -78,6 +87,7 @@ function animate() {
         console.log("End Over");
         cancelAnimationFrame(animationId);
         document.querySelector("#gameOver").style.display = "flex";
+        gameStarted = false;
       }
     }
   }
@@ -139,6 +149,29 @@ const mouse = {
   y: undefined,
 };
 
+// --------------  Event Listener -------------------- //
+
+startGameButton.addEventListener("click", function () {
+  if (!gameStarted) {
+    gameStarted = true; // Set the flag to true since the game is starting
+    image.src = "img/gameMap.png"; // Assuming your image loading and game initialization happens here
+  }
+  document.getElementById("start").style.display = "none";
+});
+
+restartGameButton.addEventListener("click", function () {
+  document.getElementById("start").style.display = "flex";
+  document.getElementById("gameOver").style.display = "none";
+  coins = 100;
+  heart = 10;
+  buildings = [];
+  activeTile = undefined;
+  enemyCount = 3;
+
+  document.querySelector("#coins").innerText = coins;
+  document.querySelector("#heart").innerText = coins;
+});
+
 canvas.addEventListener("click", (event) => {
   if (activeTile && !activeTile.isOccupied && coins - 50 >= 0) {
     coins -= 50;
@@ -153,8 +186,12 @@ canvas.addEventListener("click", (event) => {
 });
 
 window.addEventListener("mousemove", (event) => {
-  mouse.x = event.clientX;
-  mouse.y = event.clientY;
+  // Get canvas bounds
+  const rect = canvas.getBoundingClientRect();
+
+  // Adjust mouse coordinates
+  mouse.x = event.clientX - rect.left;
+  mouse.y = event.clientY - rect.top;
 
   activeTile = null;
   for (let i = 0; i < placementTiles.length; i++) {

@@ -11,36 +11,67 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tower Defense</title>
-    <style>
-      body {
-        background: black;
-        font-family: "Changa One", sans-serif;
-      }
-    </style>
+    <link rel="stylesheet" href="style/style.css" />
   </head>
   <body>
     <!-- Content goes here -->
-    <div id="start"></div>
+    <div id="start">
+      <div id="gameInstructions">
+        <h1>Fortress Guardians: Orc Siege</h1>
+        <h2>How to Play</h2>
+        <p>
+          Welcome to the defense! Your mission is to protect your base from the
+          onslaught of orcs determined to reach the other side of the board. Use
+          your wits and resources to block their path and eliminate them before
+          they can breach your defenses.
+        </p>
+        <h3>Building Structures</h3>
+        <ul>
+          <li>
+            Constructing any structure costs <strong>50 coins</strong>. Plan
+            your defenses wisely.
+          </li>
+          <li>
+            To build, select the desired structure from your inventory and place
+            it on the board where strategic.
+          </li>
+        </ul>
+        <h3>Battling Orcs</h3>
+        <ul>
+          <li>
+            Each orc you defeat earns you <strong>25 coins</strong>. Use these
+            coins to bolster your defenses.
+          </li>
+          <li>
+            Stay vigilant! Orcs will come in waves and attempt different paths
+            to breach your base.
+          </li>
+        </ul>
+        <h3>Winning & Losing</h3>
+        <ul>
+          <li>
+            Your base has a heart count. Each orc that reaches the end of the
+            board will cost you one heart.
+          </li>
+          <li>
+            The game is over if your heart count reaches <strong>0</strong>.
+            Protect your base at all costs!
+          </li>
+        </ul>
+        <p>Strategize, defend, and adapt to the challenges ahead. Good luck!</p>
+      </div>
+      <div id="button">
+        <button id="startGameButton">Start Game</button>
+      </div>
+    </div>
     <div style="position: relative; display: inline-block">
       <canvas></canvas>
-      <div
-        id="gameOver"
-        style="
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          display: none;
-          align-items: center;
-          justify-content: center;
-          font-size: 72px;
-          color: white;
-          -webkit-text-stroke: 3px black;
-        "
-      >
-        GAME OVER
+
+      <div id="gameOver">
+        <div id="gameOverText">GAME OVER</div>
+        <button id="restartGameButton">Restart Game</button>
       </div>
+
       <div
         style="
           position: absolute;
