@@ -1,5 +1,11 @@
 let animationId; // Declare this outside to keep track of the animation frame ID
 let gameStarted = false;
+let endGame = false;
+
+const mouse = {
+  x: undefined,
+  y: undefined,
+};
 
 // Get Document
 const startGameButton = document.getElementById("startGameButton");
@@ -7,6 +13,8 @@ const startGameButton = document.getElementById("startGameButton");
 const restartGameButton = document.getElementById("restartGameButton");
 
 const backGameButton = document.getElementById("backGameButton");
+
+const orcsKilled = document.getElementById("orcs-killed");
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
@@ -23,7 +31,7 @@ for (let i = 0; i < placementTilesData.length; i += 20) {
   placementTilesData2D.push(placementTilesData.slice(i, i + 20));
 }
 
-const placementTiles = [];
+let placementTiles = [];
 
 placementTilesData2D.forEach((row, y) => {
   row.forEach((symbol, x) => {
@@ -46,6 +54,17 @@ image.onload = () => {
   animate();
 };
 
+const levels = [
+  new Level(1, 3, 3, 4),
+  new Level(2, 3.25, 10, 5),
+  //   new Level(3, 3.5, 13, 6),
+  //   new Level(4, 3.75, 17, 7),
+  //   new Level(5, 4, 20, 8),
+  //   new Level(6, 4.24, 23, 9),
+
+  // Add more levels as needed
+];
+console.log(levels);
 let enemies = [];
 
 function spawnEnemies(spawnCount) {
@@ -60,16 +79,25 @@ function spawnEnemies(spawnCount) {
       })
     );
   }
+
+  waveActive = false;
 }
 
 let buildings = [];
 let activeTile = undefined;
 let enemyCount = 3;
-let hearts = 10;
-let coins = 100;
+let hearts = 20;
+let coins = 500;
 const explosions = [];
+let currentLevelIndex = 0;
+let currentWave = 0;
+let waveActive = false;
+let countOrcsKilled = 0;
 
-spawnEnemies(enemyCount);
+document.querySelector("#heart").innerText = hearts;
+document.querySelector("#coins").innerText = coins;
+
+spawnEnemies(levels[currentLevelIndex].enemyCount);
 
 function animate() {
   animationId = requestAnimationFrame(animate);
@@ -88,6 +116,9 @@ function animate() {
         console.log("End Over");
         cancelAnimationFrame(animationId);
         document.querySelector("#gameOver").style.display = "flex";
+        document.querySelector(
+          "#orcs-killed"
+        ).innerText = `Score: ${countOrcsKilled} orcs killed!`;
         gameStarted = false;
       }
     }
@@ -101,11 +132,36 @@ function animate() {
       explosions.splice(i, 1);
     }
   }
-
-  //track total amount of enemies
-  if (enemies.length === 0) {
-    enemyCount += 2;
-    spawnEnemies(enemyCount);
+  console.log("wave current", currentWave);
+  console.log("wave ", levels[currentLevelIndex].wave);
+  console.log("level", levels[currentLevelIndex].level);
+  if (enemies.length === 0 && !waveActive) {
+    if (currentWave < levels[currentLevelIndex].wave) {
+      console.log("wave", levels[currentLevelIndex].wave);
+      // Start a new wave
+      waveActive = true;
+      enemyCount += 2;
+      spawnEnemies(levels[currentLevelIndex].enemyCount + enemyCount);
+      currentWave++;
+    } else if (currentLevelIndex < levels.length - 1) {
+      // Move to the next level
+      currentLevelIndex++;
+      currentWave = 0;
+      waveActive = true;
+      enemyCount = 0;
+      console.log(levels[currentLevelIndex].level);
+      spawnEnemies(levels[currentLevelIndex].enemyCount);
+    } else {
+      // All levels completed
+      console.log("Game Completed!");
+      cancelAnimationFrame(animationId);
+      // Show game completed message or screen
+      document.querySelector(
+        "#orcs-killed"
+      ).innerText = `Score: ${countOrcsKilled} orcs killed!`;
+      document.querySelector("#gameOver").style.display = "flex";
+      gameStarted = false;
+    }
   }
 
   placementTiles.forEach((tile) => {
@@ -136,7 +192,7 @@ function animate() {
 
       //this is when a Projectile hits an enemy
       if (distance < projectile.enemy.radius + projectile.radius) {
-        projectile.enemy.health -= 20;
+        projectile.enemy.health -= 50;
         if (projectile.enemy.health <= 0) {
           const enemyIndex = enemies.findIndex((enemy) => {
             return projectile.enemy === enemy;
@@ -144,6 +200,7 @@ function animate() {
           if (enemyIndex > -1) {
             enemies.splice(enemyIndex, 1);
             coins += 25;
+            countOrcsKilled++;
             document.querySelector("#coins").innerText = coins;
           }
         }
@@ -162,10 +219,27 @@ function animate() {
   });
 }
 
-const mouse = {
-  x: undefined,
-  y: undefined,
-};
+function resetGame() {
+  coins = 500;
+  hearts = 10;
+  buildings = [];
+  enemies = [];
+  activeTile = undefined;
+  gameStarted = false; // Reset game started flag
+  currentLevelIndex = 0;
+  currentWave = 0;
+  waveActive = false;
+  countOrcsKilled = 0;
+
+  for (let i = 0; i < placementTiles.length; i++) {
+    const tile = placementTiles[i];
+
+    tile.isOccupied = false;
+  }
+
+  document.querySelector("#coins").innerText = coins;
+  document.querySelector("#heart").innerText = hearts;
+}
 
 // --------------  Event Listener -------------------- //
 
@@ -182,15 +256,7 @@ backGameButton.addEventListener("click", function () {
   c.fillStyle = "white";
   c.fillRect(0, 0, canvas.width, canvas.height);
 
-  coins = 100;
-  hearts = 10;
-  buildings = [];
-  enemies = [];
-  activeTile = undefined;
-  enemyCount = 3;
-
-  document.querySelector("#coins").innerText = coins;
-  document.querySelector("#heart").innerText = hearts;
+  resetGame();
 
   document.getElementById("gameOver").style.display = "none";
   document.getElementById("start").style.display = "flex";
@@ -198,21 +264,10 @@ backGameButton.addEventListener("click", function () {
 
 restartGameButton.addEventListener("click", function () {
   document.getElementById("gameOver").style.display = "none";
-  console.log(enemies);
-  coins = 100;
-  hearts = 10;
-  buildings = [];
-  enemies = [];
-  activeTile = undefined;
-  enemyCount = 3;
-  gameStarted = false; // Reset game started flag
 
-  spawnEnemies(enemyCount);
+  resetGame();
 
-  console.log(enemies);
-
-  document.querySelector("#coins").innerText = coins;
-  document.querySelector("#heart").innerText = hearts;
+  spawnEnemies(levels[currentLevelIndex].enemyCount);
 
   c.clearRect(0, 0, canvas.width, canvas.height);
 

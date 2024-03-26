@@ -1,5 +1,5 @@
 class Enemy extends Sprite {
-  constructor({ position = { x: 0, y: 0 } }) {
+  constructor({ position = { x: 0, y: 0 }, speed = 3 }) {
     super({ position, imageSrc: "img/orc.png", frames: { max: 7 } });
 
     this.width = 100;
@@ -15,6 +15,7 @@ class Enemy extends Sprite {
       x: 0,
       y: 0,
     };
+    this.speed = speed;
   }
 
   draw() {
@@ -43,9 +44,8 @@ class Enemy extends Sprite {
     const xDistance = waypoint.x - this.center.x;
     const angle = Math.atan2(yDistance, xDistance);
 
-    const speed = 3;
-    this.velocity.x = Math.cos(angle) * speed;
-    this.velocity.y = Math.sin(angle) * speed;
+    this.velocity.x = Math.cos(angle) * this.speed;
+    this.velocity.y = Math.sin(angle) * this.speed;
 
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
