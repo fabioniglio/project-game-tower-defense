@@ -87,7 +87,7 @@ let buildings = [];
 let activeTile = undefined;
 let enemyCount = 3;
 let hearts = 20;
-let coins = 500;
+let coins = 100;
 const explosions = [];
 let currentLevelIndex = 0;
 let currentWave = 0;
@@ -220,7 +220,7 @@ function animate() {
 }
 
 function resetGame() {
-  coins = 500;
+  coins = 100;
   hearts = 10;
   buildings = [];
   enemies = [];
