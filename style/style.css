@@ -30,11 +30,16 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  height: 100vh; /* Make sure it takes full viewport height */
+  width: 100vw;
   z-index: 2;
 }
 
 #gameInstructions {
-  max-width: 600px;
+  max-width: 60%; /* Adjusted to prevent overflow, consider the screen size */
+  max-height: 70%;
+  width: auto; /* This can be adjusted based on your design needs */
+
   margin: 20px;
   padding: 20px;
   background-color: #fae6d3;
@@ -43,6 +48,12 @@ body {
   color: #666;
   line-height: 1.6;
   font-family: "Changa One", sans-serif;
+
+  flex-direction: column; /* Change this to row to make content horizontal */
+
+  justify-content: center; /* Center the items horizontally */
+  align-items: flex-start; /* Align items to the start of the flex-direction */
+  overflow: auto; /* Add scroll if content overflows */
 }
 
 #gameInstructions h2,
