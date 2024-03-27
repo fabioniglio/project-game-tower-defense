@@ -1,6 +1,8 @@
 let animationId; // Declare this outside to keep track of the animation frame ID
 let gameStarted = false;
 let endGame = false;
+let isPaused = false;
+let isRadiusBoostActive = false;
 
 const mouse = {
   x: undefined,
@@ -15,6 +17,8 @@ const restartGameButton = document.getElementById("restartGameButton");
 const backGameButton = document.getElementById("backGameButton");
 
 const orcsKilled = document.getElementById("orcs-killed");
+
+const level = document.getElementById("level");
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
@@ -55,12 +59,12 @@ image.onload = () => {
 };
 
 const levels = [
-  new Level(1, 3, 3, 4),
-  new Level(2, 3.25, 10, 5),
-  //   new Level(3, 3.5, 13, 6),
-  //   new Level(4, 3.75, 17, 7),
-  //   new Level(5, 4, 20, 8),
-  //   new Level(6, 4.24, 23, 9),
+  new Level(1, 1, 3, 4),
+  new Level(2, 5, 10, 5),
+  new Level(3, 6, 13, 6),
+  new Level(4, 7, 17, 7),
+  new Level(5, 8, 20, 8),
+  new Level(6, 9, 23, 9),
 
   // Add more levels as needed
 ];
@@ -87,10 +91,10 @@ let buildings = [];
 let activeTile = undefined;
 let enemyCount = 3;
 let hearts = 20;
-let coins = 100;
+let coins = 1000;
 const explosions = [];
 let currentLevelIndex = 0;
-let currentWave = 0;
+let currentWave = 1;
 let waveActive = false;
 let countOrcsKilled = 0;
 
@@ -100,6 +104,9 @@ document.querySelector("#coins").innerText = coins;
 spawnEnemies(levels[currentLevelIndex].enemyCount);
 
 function animate() {
+  if (isPaused) {
+    return; // Exit the function early if the game is paused
+  }
   animationId = requestAnimationFrame(animate);
 
   c.drawImage(image, 0, 0);
@@ -132,24 +139,24 @@ function animate() {
       explosions.splice(i, 1);
     }
   }
-  console.log("wave current", currentWave);
-  console.log("wave ", levels[currentLevelIndex].wave);
-  console.log("level", levels[currentLevelIndex].level);
+
   if (enemies.length === 0 && !waveActive) {
     if (currentWave < levels[currentLevelIndex].wave) {
       console.log("wave", levels[currentLevelIndex].wave);
       // Start a new wave
       waveActive = true;
       enemyCount += 2;
+      level.innerText = `Level ${levels[currentLevelIndex].level} - Wave ${currentWave}`;
       spawnEnemies(levels[currentLevelIndex].enemyCount + enemyCount);
       currentWave++;
     } else if (currentLevelIndex < levels.length - 1) {
       // Move to the next level
       currentLevelIndex++;
-      currentWave = 0;
+      currentWave = 1;
       waveActive = true;
       enemyCount = 0;
-      console.log(levels[currentLevelIndex].level);
+      level.innerText = `Level ${levels[currentLevelIndex].level} - Wave ${currentWave}`;
+
       spawnEnemies(levels[currentLevelIndex].enemyCount);
     } else {
       // All levels completed
@@ -227,9 +234,11 @@ function resetGame() {
   activeTile = undefined;
   gameStarted = false; // Reset game started flag
   currentLevelIndex = 0;
-  currentWave = 0;
+  currentWave = 1;
   waveActive = false;
   countOrcsKilled = 0;
+
+  level.innerText = `Level 1 - Wave ${currentWave}`;
 
   for (let i = 0; i < placementTiles.length; i++) {
     const tile = placementTiles[i];
@@ -314,5 +323,37 @@ window.addEventListener("mousemove", (event) => {
       activeTile = tile;
       break;
     }
+  }
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.code === "KeyP") {
+    // Check if the 'P' key was pressed
+    isPaused = !isPaused; // Toggle the pause state
+
+    if (!isPaused) {
+      // If the game has just been unpaused, restart the animation loop
+      requestAnimationFrame(animate);
+    }
+  }
+
+  if (event.code === "Space" && coins >= 200 && !isRadiusBoostActive) {
+    coins -= 200; // Deduct coins
+    document.querySelector("#coins").innerText = coins; // Update coins display
+
+    buildingRadiusModifier = 2; // Double the radius modifier
+    isRadiusBoostActive = true; // Prevent reactivation
+
+    buildings.forEach(
+      (building) => (building.buildingRadiusModifier = buildingRadiusModifier)
+    );
+
+    setTimeout(() => {
+      buildingRadiusModifier = 1; // Revert to original radius after 5 seconds
+      buildings.forEach(
+        (building) => (building.buildingRadiusModifier = buildingRadiusModifier)
+      );
+      isRadiusBoostActive = false; // Allow reactivation
+    }, 5000); // 5000 milliseconds = 5 seconds
   }
 });

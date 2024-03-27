@@ -55,15 +55,13 @@ class Enemy extends Sprite {
     };
 
     // Check if within a certain "close enough" range of the waypoint
-
+    const distanceToNextWaypoint = Math.sqrt(
+      xDistance * xDistance + yDistance * yDistance
+    );
     if (
-      Math.abs(Math.round(this.center.x) - Math.round(waypoint.x)) <
-        Math.abs(this.velocity.x) &&
-      Math.abs(Math.round(this.center.y) - Math.round(waypoint.y)) <
-        Math.abs(this.velocity.y) &&
+      distanceToNextWaypoint < this.speed &&
       this.waypointIndex < waypoints.length - 1
     ) {
-      // Use a threshold distance
       this.waypointIndex++;
     }
   }
