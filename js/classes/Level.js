@@ -6,12 +6,9 @@ class Level {
     this.wave = wave;
   }
 
-  // Method to start the level
-  start() {
-    console.log(
-      `Starting Level ${this.level} with ${this.enemyCount} enemies.`
-    );
-    // Initialize level-specific elements here
+  // Method to increase speed of enemies the level
+  addSpeed() {
+    this.speed += 0.5;
   }
 
   // Additional methods as needed

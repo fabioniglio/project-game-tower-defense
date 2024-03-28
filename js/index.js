@@ -59,12 +59,12 @@ image.onload = () => {
 };
 
 const levels = [
-  new Level(1, 1, 3, 4),
-  new Level(2, 5, 10, 5),
-  new Level(3, 6, 13, 6),
-  new Level(4, 7, 17, 7),
-  new Level(5, 8, 20, 8),
-  new Level(6, 9, 23, 9),
+  new Level(1, 2, 3, 4),
+  new Level(2, 3, 10, 5),
+  //   new Level(3, 6, 13, 6),
+  //   new Level(4, 7, 17, 7),
+  //   new Level(5, 8, 20, 8),
+  //   new Level(6, 9, 23, 9),
 
   // Add more levels as needed
 ];
@@ -73,6 +73,8 @@ let enemies = [];
 
 function spawnEnemies(spawnCount) {
   for (let i = 1; i < spawnCount + 1; i++) {
+    if (!levels[currentLevelIndex].wave == 1)
+      levels[currentLevelIndex].addSpeed();
     const xOffset = i * 150;
     enemies.push(
       new Enemy({
@@ -80,6 +82,7 @@ function spawnEnemies(spawnCount) {
           x: waypoints[0].x - xOffset,
           y: waypoints[0].y,
         },
+        speed: levels[currentLevelIndex].speed,
       })
     );
   }
@@ -125,7 +128,7 @@ function animate() {
         document.querySelector("#gameOver").style.display = "flex";
         document.querySelector(
           "#orcs-killed"
-        ).innerText = `Score: ${countOrcsKilled} orcs killed!`;
+        ).innerText = `You Lose! Score: ${countOrcsKilled} orcs killed!`;
         gameStarted = false;
       }
     }
@@ -165,7 +168,7 @@ function animate() {
       // Show game completed message or screen
       document.querySelector(
         "#orcs-killed"
-      ).innerText = `Score: ${countOrcsKilled} orcs killed!`;
+      ).innerText = `You Destroyed the Horde! Score: ${countOrcsKilled} orcs killed!`;
       document.querySelector("#gameOver").style.display = "flex";
       gameStarted = false;
     }
