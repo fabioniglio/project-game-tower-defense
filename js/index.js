@@ -58,9 +58,14 @@ image.onload = () => {
   animate();
 };
 
-const levels = [
-  new Level(1, 2, 3, 4),
-  new Level(2, 3, 10, 5),
+//level , speed, enemy count, wave
+levels = [
+  new Level(1, 2, 3, 5),
+  new Level(2, 3, 7, 5),
+  new Level(3, 3, 10, 5),
+  new Level(4, 3, 20, 5),
+  new Level(5, 3, 30, 5),
+  new Level(6, 3, 40, 5),
   //   new Level(3, 6, 13, 6),
   //   new Level(4, 7, 17, 7),
   //   new Level(5, 8, 20, 8),
@@ -72,9 +77,13 @@ console.log(levels);
 let enemies = [];
 
 function spawnEnemies(spawnCount) {
+  console.log(currentWave);
+
+  if (currentWave != 1) {
+    levels[currentLevelIndex].addSpeed();
+    console.log(levels[currentLevelIndex].speed);
+  }
   for (let i = 1; i < spawnCount + 1; i++) {
-    if (!levels[currentLevelIndex].wave == 1)
-      levels[currentLevelIndex].addSpeed();
     const xOffset = i * 150;
     enemies.push(
       new Enemy({
@@ -86,7 +95,7 @@ function spawnEnemies(spawnCount) {
       })
     );
   }
-
+  console.log(enemies);
   waveActive = false;
 }
 
@@ -148,7 +157,7 @@ function animate() {
       console.log("wave", levels[currentLevelIndex].wave);
       // Start a new wave
       waveActive = true;
-      enemyCount += 2;
+      enemyCount += 3;
       level.innerText = `Level ${levels[currentLevelIndex].level} - Wave ${currentWave}`;
       spawnEnemies(levels[currentLevelIndex].enemyCount + enemyCount);
       currentWave++;
