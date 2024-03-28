@@ -19,21 +19,27 @@ class Building extends Sprite {
       y: this.position.y + this.height / 2,
     };
     this.projectiles = [];
-    this.radius = 250;
+
+    this.baseRadius = 250;
 
     this.target;
     this.buildingRadiusModifier = 1;
+    this.radius = this.baseRadius * this.buildingRadiusModifier;
   }
 
   draw() {
     super.draw();
 
-    const effectiveRadius = this.radius * this.buildingRadiusModifier;
+    const effectiveRadius = this.radius;
 
     // c.beginPath();
     // c.arc(this.center.x, this.center.y, effectiveRadius, 0, Math.PI * 2);
     // c.fillStyle = "rgba(0,0,255, 0.2";
     // c.fill();
+  }
+
+  changeRadius(buildingRadiusModifier) {
+    this.radius = this.baseRadius * buildingRadiusModifier;
   }
 
   update() {

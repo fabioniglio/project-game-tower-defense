@@ -66,10 +66,6 @@ levels = [
   new Level(4, 3, 20, 5),
   new Level(5, 3, 30, 5),
   new Level(6, 3, 40, 5),
-  //   new Level(3, 6, 13, 6),
-  //   new Level(4, 7, 17, 7),
-  //   new Level(5, 8, 20, 8),
-  //   new Level(6, 9, 23, 9),
 
   // Add more levels as needed
 ];
@@ -197,6 +193,7 @@ function animate() {
       const distance = Math.hypot(xDifference, yDifference);
       return distance < enemy.radius + building.radius;
     });
+    console.log(validEnemies);
     building.target = validEnemies[0];
 
     for (let i = building.projectiles.length - 1; i >= 0; i--) {
@@ -352,18 +349,20 @@ window.addEventListener("keydown", (event) => {
   if (event.code === "Space" && coins >= 200 && !isRadiusBoostActive) {
     coins -= 200; // Deduct coins
     document.querySelector("#coins").innerText = coins; // Update coins display
-
+    console.log("activate special radius");
     buildingRadiusModifier = 2; // Double the radius modifier
     isRadiusBoostActive = true; // Prevent reactivation
 
-    buildings.forEach(
-      (building) => (building.buildingRadiusModifier = buildingRadiusModifier)
+    buildings.forEach((building) =>
+      building.changeRadius(buildingRadiusModifier)
     );
+
+    console.log(buildings);
 
     setTimeout(() => {
       buildingRadiusModifier = 1; // Revert to original radius after 5 seconds
-      buildings.forEach(
-        (building) => (building.buildingRadiusModifier = buildingRadiusModifier)
+      buildings.forEach((building) =>
+        building.changeRadius(buildingRadiusModifier)
       );
       isRadiusBoostActive = false; // Allow reactivation
     }, 5000); // 5000 milliseconds = 5 seconds
