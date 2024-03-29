@@ -62,10 +62,10 @@ image.onload = () => {
 levels = [
   new Level(1, 2, 3, 5),
   new Level(2, 3, 7, 5),
-  new Level(3, 3, 10, 5),
-  new Level(4, 3, 20, 5),
-  new Level(5, 3, 30, 5),
-  new Level(6, 3, 40, 5),
+  //   new Level(3, 3, 10, 5),
+  //   new Level(4, 3, 20, 5),
+  //   new Level(5, 3, 30, 5),
+  //   new Level(6, 3, 40, 5),
 
   // Add more levels as needed
 ];
